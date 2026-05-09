@@ -1,32 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal | Programmer Portfolio</title>
-    <meta name="description" content="A modern 90s terminal-style landing page for a programmer.">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
-</head>
-<body class="crt">
-    <div class="scanlines"></div>
-    <div class="terminal-container">
-        <header id="boot-sequence"></header>
-        
-        <main id="terminal-output">
-            <section id="prompt-section">
-                <span class="prompt">guest@terminal:~$</span>
-                <span id="typing-line"></span>
-                <span class="cursor">_</span>
-            </section>
-        </main>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>robin alex</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 100vw; height: 100vh; background: #fff; overflow: hidden; }
 
-        <section id="input-area">
-            <input type="text" id="terminal-input" autofocus spellcheck="false" autocomplete="off">
-        </section>
-    </div>
-    <script src="app.js"></script>
+    #home { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+    #home img { max-width: 90vw; max-height: 90vh; }
+
+    #menu { display: none; width: 100%; height: 100%; position: relative; }
+    #menu.visible { display: block; }
+
+    #menu a { position: absolute; display: block; cursor: pointer; }
+    #menu a img { height: 60px; }
+
+    #github   { top: 38%; left: 42%; }
+    #art      { top: 35%; left: 54%; }
+    #blogs    { top: 48%; left: 46%; }
+    #projects { top: 53%; left: 34%; }
+    #photos   { top: 57%; left: 52%; }
+  </style>
+</head>
+<body>
+  <div id="home">
+    <img src="img.png" alt="robin alex" />
+  </div>
+
+  <div id="menu">
+    <a id="github"   href="#"><img src="github.png"   alt="github" /></a>
+    <a id="art"      href="#"><img src="art.png"      alt="art" /></a>
+    <a id="blogs"    href="#"><img src="blogs.png"    alt="blogs" /></a>
+    <a id="projects" href="#"><img src="projects.png" alt="projects" /></a>
+    <a id="photos"   href="#"><img src="photos.png"   alt="photos" /></a>
+  </div>
+
+  <script>
+    document.getElementById('home').addEventListener('click', function () {
+      this.style.display = 'none';
+      document.getElementById('menu').classList.add('visible');
+    });
+  </script>
 </body>
 </html>
