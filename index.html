@@ -22,7 +22,10 @@
       text-decoration: none;
       color: #111;
       font-family: Georgia, serif;
+      transition: transform 0.15s ease;
     }
+
+    #menu a.selected { transform: scale(1.25); }
 
     #github   { top: 38%; left: 42%; font-size: 1.8vw; }
     #art      { top: 35%; left: 54%; font-size: 2.4vw; }
@@ -46,22 +49,69 @@
 
   <script>
     const home = document.getElementById('home');
+    const menu = document.getElementById('menu');
+
+    const keyMap = {
+      g: ['github'],
+      a: ['art'],
+      b: ['blogs'],
+      p: ['projects', 'photos'],
+    };
+
+    let selected = null;
+    let cycleIndex = 0;
+
+    function select(id) {
+      if (selected) document.getElementById(selected).classList.remove('selected');
+      selected = id;
+      document.getElementById(selected).classList.add('selected');
+    }
+
+    function deselect() {
+      if (selected) document.getElementById(selected).classList.remove('selected');
+      selected = null;
+    }
 
     function openMenu() {
       home.style.display = 'none';
-      document.getElementById('menu').classList.add('visible');
+      menu.classList.add('visible');
+    }
+
+    function closeMenu() {
+      deselect();
+      menu.classList.remove('visible');
+      home.style.display = '';
     }
 
     home.querySelector('img').addEventListener('click', openMenu);
 
     document.addEventListener('keydown', function (e) {
-      if (e.code === 'Space' && home.style.display !== 'none') {
+      const menuOpen = menu.classList.contains('visible');
+
+      if (e.code === 'Space' && !menuOpen) { e.preventDefault(); openMenu(); return; }
+      if (e.code === 'Backspace' && menuOpen) { closeMenu(); return; }
+      if (e.code === 'Escape' && menuOpen) { deselect(); return; }
+
+      if (menuOpen && e.code === 'Space' && selected) {
         e.preventDefault();
-        openMenu();
+        document.getElementById(selected).click();
+        return;
       }
-      if (e.code === 'Backspace' && home.style.display === 'none') {
-        document.getElementById('menu').classList.remove('visible');
-        home.style.display = '';
+
+      if (menuOpen) {
+        const key = e.key.toLowerCase();
+        const items = keyMap[key];
+        if (!items) return;
+        if (items.length === 1) {
+          selected === items[0] ? deselect() : select(items[0]);
+        } else {
+          if (selected && items.includes(selected)) {
+            cycleIndex = (items.indexOf(selected) + 1) % items.length;
+          } else {
+            cycleIndex = 0;
+          }
+          select(items[cycleIndex]);
+        }
       }
     });
   </script>
