@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>robin alex</title>
-  <link rel="icon" href="favicon.png" />
+  <link rel="icon" href="images/favicon.png" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { width: 100vw; height: 100vh; background: #fff; overflow: hidden; }
+    body { width: 100vw; height: 100vh; background: #fff; overflow: hidden; font-family: Georgia, serif; }
 
     #home { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
     #home img { max-width: 90vw; max-height: 90vh; }
@@ -15,27 +15,33 @@
     #menu { display: none; width: 100%; height: 100%; position: relative; }
     #menu.visible { display: block; }
 
-    #menu a { position: absolute; display: block; cursor: pointer; }
-    #menu a img { height: 60px; }
+    #menu a {
+      position: absolute;
+      display: block;
+      cursor: pointer;
+      text-decoration: none;
+      color: #111;
+      font-family: Georgia, serif;
+    }
 
-    #github   { top: 38%; left: 42%; }
-    #art      { top: 35%; left: 54%; }
-    #blogs    { top: 48%; left: 46%; }
-    #projects { top: 53%; left: 34%; }
-    #photos   { top: 57%; left: 52%; }
+    #github   { top: 38%; left: 42%; font-size: 1.8vw; }
+    #art      { top: 35%; left: 54%; font-size: 2.4vw; }
+    #blogs    { top: 48%; left: 46%; font-size: 1.6vw; }
+    #projects { top: 53%; left: 34%; font-size: 2.1vw; }
+    #photos   { top: 57%; left: 52%; font-size: 2.8vw; }
   </style>
 </head>
 <body>
   <div id="home">
-    <img src="img.png" alt="robin alex" />
+    <img src="images/img.png" alt="robin alex" />
   </div>
 
   <div id="menu">
-    <a id="github"   href="#"><img src="github.png"   alt="github" /></a>
-    <a id="art"      href="#"><img src="art.png"      alt="art" /></a>
-    <a id="blogs"    href="#"><img src="blogs.png"    alt="blogs" /></a>
-    <a id="projects" href="#"><img src="projects.png" alt="projects" /></a>
-    <a id="photos"   href="#"><img src="photos.png"   alt="photos" /></a>
+    <a id="github"   href="#">github</a>
+    <a id="art"      href="#">art</a>
+    <a id="blogs"    href="#">blogs</a>
+    <a id="projects" href="#">projects</a>
+    <a id="photos"   href="#">photos</a>
   </div>
 
   <script>
