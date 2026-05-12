@@ -32,11 +32,14 @@
     #blogs    { top: 48%; left: 46%; font-size: 1.6vw; }
     #projects { top: 53%; left: 34%; font-size: 2.1vw; }
     #photos   { top: 57%; left: 52%; font-size: 2.8vw; }
+    body.dark { background: #111; }
+    body.dark #menu a { color: #eee; }
   </style>
 </head>
 <body>
-  <div id="home">
-    <img src="images/img.png" alt="robin alex" />
+<img id="robin-logo" src="images/robin.svg" alt="robin" style="position: fixed; top: 16px; left: 16px; height: 5vh;" />
+<div id="home">
+    <img src="images/name.png" alt="robin alex" style="max-height: 20vh;" />
   </div>
 
   <div id="menu">
@@ -88,6 +91,11 @@
     document.addEventListener('keydown', function (e) {
       const menuOpen = menu.classList.contains('visible');
 
+      if (e.key.toLowerCase() === 'd') {
+        const dark = document.body.classList.toggle('dark');
+        home.querySelector('img').src = dark ? 'images/namewhite.png' : 'images/name.png';
+        return;
+      }
       if (e.code === 'Enter' && !menuOpen) { e.preventDefault(); openMenu(); return; }
       if (e.code === 'Escape' && menuOpen && !selected) { closeMenu(); return; }
       if (e.code === 'Escape' && menuOpen && selected) { deselect(); return; }
