@@ -10,7 +10,8 @@
     body { width: 100vw; height: 100vh; background: #fff; overflow: hidden; font-family: Georgia, serif; }
 
     #home { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-    #home img { max-width: 90vw; max-height: 90vh; }
+    #home span { font-family: Georgia, serif; font-size: 3vw; color: #111; }
+    body.dark #home span { color: #eee; }
 
     #menu { display: none; width: 100%; height: 100%; position: relative; }
     #menu.visible { display: block; }
@@ -34,12 +35,13 @@
     #photos   { top: 57%; left: 52%; font-size: 2.8vw; }
     body.dark { background: #111; }
     body.dark #menu a { color: #eee; }
+    body.dark #robin-logo { filter: invert(1); }
   </style>
 </head>
 <body>
-<img id="robin-logo" src="images/robin.svg" alt="robin" style="position: fixed; top: 16px; left: 16px; height: 5vh;" />
+<img id="robin-logo" src="images/robin.svg" alt="robin" style="position: fixed; top: 1vw; left: 1vw; height: 3vw; cursor: pointer; z-index: 10;" />
 <div id="home">
-    <img src="images/name.png" alt="robin alex" style="max-height: 20vh;" />
+    <span>robin alex</span>
   </div>
 
   <div id="menu">
@@ -86,19 +88,16 @@
       home.style.display = '';
     }
 
-    home.querySelector('img').addEventListener('click', openMenu);
+    home.querySelector('span').addEventListener('click', openMenu);
+    document.getElementById('robin-logo').addEventListener('click', closeMenu);
 
     document.addEventListener('keydown', function (e) {
       const menuOpen = menu.classList.contains('visible');
 
-      if (e.key.toLowerCase() === 'd') {
-        const dark = document.body.classList.toggle('dark');
-        home.querySelector('img').src = dark ? 'images/namewhite.png' : 'images/name.png';
-        return;
-      }
+      if (e.key.toLowerCase() === 'd') { document.body.classList.toggle('dark'); return; }
       if (e.code === 'Enter' && !menuOpen) { e.preventDefault(); openMenu(); return; }
-      if (e.code === 'Escape' && menuOpen && !selected) { closeMenu(); return; }
-      if (e.code === 'Escape' && menuOpen && selected) { deselect(); return; }
+      if ((e.code === 'Escape' || e.code === 'Backspace') && menuOpen && !selected) { closeMenu(); return; }
+      if ((e.code === 'Escape' || e.code === 'Backspace') && menuOpen && selected) { deselect(); return; }
 
       if (menuOpen && e.code === 'Enter' && selected) {
         e.preventDefault();
