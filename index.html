@@ -88,11 +88,11 @@
     document.addEventListener('keydown', function (e) {
       const menuOpen = menu.classList.contains('visible');
 
-      if (e.code === 'Space' && !menuOpen) { e.preventDefault(); openMenu(); return; }
-      if (e.code === 'Backspace' && menuOpen) { closeMenu(); return; }
-      if (e.code === 'Escape' && menuOpen) { deselect(); return; }
+      if (e.code === 'Enter' && !menuOpen) { e.preventDefault(); openMenu(); return; }
+      if (e.code === 'Escape' && menuOpen && !selected) { closeMenu(); return; }
+      if (e.code === 'Escape' && menuOpen && selected) { deselect(); return; }
 
-      if (menuOpen && e.code === 'Space' && selected) {
+      if (menuOpen && e.code === 'Enter' && selected) {
         e.preventDefault();
         document.getElementById(selected).click();
         return;
