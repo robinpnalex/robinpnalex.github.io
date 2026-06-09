@@ -9,6 +9,88 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { width: 100vw; height: 100vh; background: #fff; overflow: hidden; font-family: Georgia, serif; }
 
+    #site {
+      width: 100%;
+      height: 100%;
+      transition: filter 1.4s ease, opacity 1.4s ease;
+    }
+
+    body.intro-running #site {
+      filter: blur(14px);
+      opacity: 0.35;
+      animation: siteReveal 2.4s ease forwards;
+    }
+
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      animation: introFade 2.4s ease forwards;
+      pointer-events: none;
+    }
+
+    #intro img {
+      width: clamp(150px, 34vw, 340px);
+      animation: robinIntro 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    body.dark #intro {
+      background: rgba(17, 17, 17, 0.62);
+    }
+
+    body.dark #intro img {
+      filter: invert(1);
+    }
+
+    @keyframes robinIntro {
+      0% {
+        opacity: 1;
+        transform: scale(1.35);
+      }
+      58% {
+        opacity: 1;
+        transform: scale(0.86);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.34);
+      }
+    }
+
+    @keyframes introFade {
+      0% {
+        opacity: 1;
+      }
+      62% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    @keyframes siteReveal {
+      0% {
+        filter: blur(14px);
+        opacity: 0.35;
+      }
+      46% {
+        filter: blur(14px);
+        opacity: 0.35;
+      }
+      100% {
+        filter: blur(0);
+        opacity: 1;
+      }
+    }
+
     #home { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
     #home span { font-family: Georgia, serif; font-size: 3vw; color: #111; }
     body.dark #home span { color: #eee; }
@@ -36,25 +118,45 @@
     body.dark { background: #111; }
     body.dark #menu a { color: #eee; }
     body.dark #robin-logo { filter: invert(1); }
+    #robin-logo {
+      position: fixed;
+      top: 1vw;
+      left: 1vw;
+      height: 3vw;
+      cursor: pointer;
+      z-index: 10;
+    }
   </style>
 </head>
-<body>
-<img id="robin-logo" src="images/robin.svg" alt="robin" style="position: fixed; top: 1vw; left: 1vw; height: 3vw; cursor: pointer; z-index: 10;" />
-<div id="home">
-    <span>robin alex</span>
+<body class="intro-running dark">
+  <div id="intro" aria-hidden="true">
+    <img src="images/robin.svg" alt="" />
   </div>
 
-  <div id="menu">
-    <a id="github"   href="https://github.com/robinpnalex" target="_blank">github</a>
-    <a id="art"      href="#">art</a>
-    <a id="blogs"    href="#">blogs</a>
-    <a id="projects" href="#">projects</a>
-    <a id="photos"   href="#">photos</a>
+  <div id="site">
+    <img id="robin-logo" src="images/robin.svg" alt="robin" />
+    <div id="home">
+      <span>robin alex</span>
+    </div>
+
+    <div id="menu">
+      <a id="github"   href="https://github.com/robinpnalex" target="_blank">github</a>
+      <a id="art"      href="#">art</a>
+      <a id="blogs"    href="#">blogs</a>
+      <a id="projects" href="#">projects</a>
+      <a id="photos"   href="photos.html">photos</a>
+    </div>
   </div>
 
   <script>
+    const intro = document.getElementById('intro');
     const home = document.getElementById('home');
     const menu = document.getElementById('menu');
+
+    intro.addEventListener('animationend', function () {
+      document.body.classList.remove('intro-running');
+      intro.remove();
+    }, { once: true });
 
     const keyMap = {
       g: ['github'],
