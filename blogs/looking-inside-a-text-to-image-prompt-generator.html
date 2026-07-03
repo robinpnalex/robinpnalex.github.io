@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>looking inside a text-to-image prompt generator — robin alex</title>
+  <link rel="icon" href="../images/favicon.png" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #fff; font-family: Georgia, serif; color: #222; }
+    body.dark { background: #111; color: #ccc; }
+    body.dark #robin-logo { filter: invert(1); }
+
+    #robin-logo {
+      position: fixed;
+      top: clamp(10px, 1vw, 18px);
+      left: clamp(10px, 1vw, 18px);
+      height: clamp(30px, 3vw, 52px);
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    article {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 14vh clamp(24px, 5vw, 52px) 12vh;
+    }
+
+    h1 { font-size: clamp(24px, 2.4vw, 34px); font-weight: normal; color: #111; }
+    body.dark h1 { color: #eee; }
+
+    .date { color: #888; font-size: clamp(11px, 0.85vw, 14px); letter-spacing: 0.1em; margin: 10px 0 40px; }
+
+    h2 { font-size: clamp(18px, 1.6vw, 24px); font-weight: normal; color: #111; margin: 44px 0 14px; }
+    body.dark h2 { color: #eee; }
+
+    p { font-size: clamp(15px, 1.1vw, 17px); line-height: 1.9; margin: 0 0 18px; }
+
+    a { color: inherit; }
+
+    code { font-family: 'Courier New', monospace; font-size: 0.92em; background: rgba(136, 136, 136, 0.14); padding: 1px 5px; border-radius: 3px; }
+
+    pre {
+      background: rgba(136, 136, 136, 0.1);
+      border-radius: 6px;
+      padding: 16px 18px;
+      margin: 0 0 18px;
+      overflow-x: auto;
+    }
+    pre code { background: none; padding: 0; font-size: clamp(12px, 0.95vw, 14px); line-height: 1.7; }
+
+    figure { margin: 0 0 28px; text-align: center; }
+    figure img { max-width: 100%; border-radius: 6px; cursor: zoom-in; }
+    figcaption { color: #888; font-size: clamp(11px, 0.85vw, 14px); letter-spacing: 0.05em; margin-top: 8px; }
+
+    figure.wide {
+      width: min(94vw, 1100px);
+      margin-left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .tags { color: #888; font-size: clamp(11px, 0.85vw, 14px); letter-spacing: 0.1em; margin-top: 50px; }
+
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      cursor: zoom-out;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img { max-width: 92vw; max-height: 92vh; border-radius: 6px; }
+  </style>
+</head>
+<body class="dark">
+  <img id="robin-logo" src="../images/robin.svg" alt="back" onclick="window.location.href='../blogs.html'" />
+
+  <article>
+    <h1>looking inside a text-to-image prompt generator</h1>
+    <div class="date">june 22, 2026 · 6 min read</div>
+
+    <p>Text-to-image models don’t write their own prompts — usually a human does. <code>succinctly/text2image-prompt-generator</code> is a small GPT-2-based model trained to take a rough idea ("a sports car") and expand it into the kind of detailed, tag-heavy prompt that diffusion models respond well to. It's a tool a lot of people use without ever asking how it decides what to add.</p>
+
+    <p>As one of my tasks for the <a href="https://projectmanas.in/" target="_blank">Project Manas</a> task phase, I was assigned to perform mechanistic interpretability on this text-to-image model. To do that, I zeroed in on finding out where color information actually lives in the transformer. Is it a single layer? A specific attention head? Or is it smeared across the whole network with no clean answer at all? I used the <code>TransformerLens</code> library to find out.</p>
+
+    <h2>the setup</h2>
+
+    <p><code>TransformerLens</code> wraps a HuggingFace model and exposes every internal tensor — attention patterns, MLP activations, the residual stream — through a unified hook interface. Loading the model and grabbing a full cache of activations for a single forward pass looks like this:</p>
+
+    <pre><code>from transformer_lens import HookedTransformer
+
+MODEL_NAME = "succinctly/text2image-prompt-generator"
+model = HookedTransformer.from_pretrained(MODEL_NAME, device=device)
+
+print("Layers:", model.cfg.n_layers)
+print("Heads:", model.cfg.n_heads)
+print("d_model:", model.cfg.d_model)
+print("d_vocab:", model.cfg.d_vocab)
+
+# Run once and cache every internal activation
+logits_red, cache_red = model.run_with_cache(prompt_red)
+logits_blue, cache_blue = model.run_with_cache(prompt_blue)</code></pre>
+
+    <p><code>cache_red</code> and <code>cache_blue</code> holds every attention output, every MLP output, and every residual stream snapshot for the forward pass for the tokens “red” and “blue” respectively. That second cache, from a prompt that’s identical except for the one word that matters(blue), is what makes the rest of this analysis possible: it provides a “corrupted” version of the network’s internal state, which we then inject into a clean run to test, layer by layer, whether that one variable actually matters there.</p>
+
+    <h2>trial and error: getting the prompt right</h2>
+
+    <p>My first attempt used a single descriptive sentence:</p>
+
+    <pre><code>utils.test_prompt("A cinematic shot of a red car", " red", model)</code></pre>
+
+    <p>This asks the model to predict <code>" red"</code> as the token right after “car”, which is a strange thing to ask of any language model, since colour words don’t usually repeat themselves immediately right after the noun they describe. The baseline probability was weak even before I started patching anything, which made results noisy.</p>
+
+    <figure><img src="2.webp" alt="test_prompt output for the cinematic shot prompt: rank 343, probability 0.00%" /></figure>
+
+    <p>I switched to a prompt with an explicit recall structure which forces the model to return the same colour.</p>
+
+    <pre><code>prompt_red  = "A photo of a red car. The color of the car is"
+prompt_blue = "A photo of a blue car. The color of the car is"</code></pre>
+
+    <figure><img src="1.webp" alt="test_prompt outputs for the recall-structured red and blue prompts, both rank 0" /></figure>
+
+    <p>This gave a much cleaner signal: <code>" red"</code> and <code>" blue"</code> are now the literal next-token predictions, the two prompts are token-for-token identical apart from the color word, and the color token sits at the same position in both — which matters a lot once you start patching specific positions in the residual stream.</p>
+
+    <h2>observation 1: attention heads reaching back for the color</h2>
+
+    <p>Once the clean activations had been cached, I visualized the attention patterns at a few middle-to-late layers using CircuitsVis, looking specifically at whether the final token (<code>is</code>) attends back to the color token (<code>red</code>):</p>
+
+    <pre><code>layer_to_inspect = 9
+attention_pattern = cache_red["pattern", layer_to_inspect]
+cv.attention.attention_patterns(tokens=tokens_red, attention=attention_pattern[0])</code></pre>
+
+    <figure class="wide"><img src="3.webp" alt="CircuitsVis attention patterns for all heads at layer 9" /></figure>
+
+    <p>Eyeballing heatmaps for 144 heads isn’t practical, so I scored every head directly, how much attention weight does it put from the final token onto the color token:</p>
+
+    <pre><code>head_scores = []
+for layer in range(model.cfg.n_layers):
+    attention_pattern = cache_red["pattern", layer][0]
+    for head in range(model.cfg.n_heads):
+        score = attention_pattern[head, -1, color_idx].item()
+        head_scores.append((layer, head, score))</code></pre>
+
+    <pre><code>Layer 8, Head 11  |  Attention Weight: 0.1998
+Layer 9, Head  9  |  Attention Weight: 0.1940
+Layer 5, Head 10  |  Attention Weight: 0.1571
+Layer 8, Head  3  |  Attention Weight: 0.1484
+Layer 11, Head 10  |  Attention Weight: 0.1306</code></pre>
+
+    <p>The top result: Layer 8, Head 11 (attention weight ≈ 0.20), with Layer 9, Head 9 right behind it (≈ 0.19). Both land in the back half of the network, that’s roughly where you’d expect “concept retrieval” to kick in, once the early layers are done handling basic syntax. Basically, these are the two heads doing most of the work of connecting the final token “is” back to “red.”</p>
+
+    <figure class="wide">
+      <img src="4.webp" alt="layer 9 head 9 attention pattern with the red token highlighted from the is token" />
+      <figcaption>the “red” token lights up when you select the “is” token</figcaption>
+    </figure>
+
+    <figure class="wide"><img src="5.webp" alt="layer 8 head 11 attention pattern" /></figure>
+
+    <figure class="wide">
+      <img src="6.webp" alt="layer 3 head 11 attention pattern attending along the diagonal" />
+      <figcaption>layer 3 head 11 as a contrasting example</figcaption>
+    </figure>
+
+    <h2>observation 2: causal patching</h2>
+
+    <p>Attention weight only tells you where a head is looking and not whether that changes anything in further layers. To test causality directly, I patched the residual stream : take the cached “blue” activations and inject them into the clean “red” run, one <code>(layer, position)</code> cell at a time, then measure how much the model's preference for "red" over "blue" shifts.</p>
+
+    <pre><code>def patch_residual_stream(activations, hook, layer, pos):
+    activations[:, pos, :] = cache_blue[layer][:, pos, :]
+    return activations</code></pre>
+
+    <pre><code>patching_effect = torch.zeros(n_layers, n_pos)
+for l, layer in enumerate(layers):
+    for pos in range(n_pos):
+        fwd_hooks = [(layer, partial(patch_residual_stream, layer=layer, pos=pos))]
+        logits = model.run_with_hooks(prompt_red, fwd_hooks=fwd_hooks)[0, -1]
+        patching_effect[l, pos] = logits[clean_answer_index] - logits[corrupt_answer_index]</code></pre>
+
+    <figure><img src="7.webp" alt="heatmap of residual stream patching effect by layer and position" /></figure>
+
+    <p>Two things stood out. First, patching the color token’s own position moves the score at almost every layer — expected, since causal attention means corrupting that token early on affects everything downstream that’s allowed to look back at it. The more interesting result is the final token’s position: patching it does almost nothing in early-to-mid layers, and only starts to matter from around layer 9 onward. That’s a clean signature of when the relevant information actually gets collected at the position that’s about to generate the next word — it isn’t there yet in the early layers; it has to be fetched.</p>
+
+    <h2>observation 3: attention head patching</h2>
+
+    <p>The residual-stream patch mixes together every head’s and the MLP’s contribution at once. To isolate individual heads, I patched one head’s output at a time, across all positions:</p>
+
+    <pre><code>model.set_use_attn_result(True)  # hook_result only exists with this flag on
+_, cache_blue = model.run_with_cache(prompt_blue)</code></pre>
+
+    <pre><code>def patch_head_result(activations, hook, head):
+    activations[:, :, head, :] = cache_blue[hook.name][:, :, head, :]
+    return activations
+
+patching_effect = torch.zeros(n_layers, n_heads)
+for layer in range(n_layers):
+    for head in range(n_heads):
+        fwd_hooks = [(f"blocks.{layer}.attn.hook_result", partial(patch_head_result, head=head))]
+        logits = model.run_with_hooks(prompt_red, fwd_hooks=fwd_hooks)[0, -1]
+        patching_effect[layer, head] = logits[clean_answer_index] - logits[corrupt_answer_index]</code></pre>
+
+    <figure class="wide"><img src="8.webp" alt="per-head patching heatmap showing which head causally carries red vs blue" /></figure>
+
+    <p>This is where the two methods disagreed in an interesting way. Layer 9, Head 9, my second-ranked head by attention weight, turned out to be the single most causally important head in the entire model, swinging the logit difference from a mildly “red” favoring baseline to a strongly “blue” favoring one almost on its own. Meanwhile Layer 8, Head 11, the head with the highest raw attention score, barely moved the needle by comparison. Attention weight pointed me toward the right neighborhood, but it wasn’t a reliable ranking of actual importance on its own.</p>
+
+    <p>There was also a head that did the opposite of what I expected: patching it increased the model’s preference for “red” rather than decreasing it. The likely explanation is that this head normally suppresses the “red” prediction a little, and swapping in its “blue” context behavior removed that suppression a “suppressor head,” the kind of thing that’s shown up in other interpretability work on much larger models too.</p>
+
+    <h2>takeaways</h2>
+
+    <p>Three different methods- attention inspection, residual stream patching, and attention head patching gave us the same rough story: this model first registers the color attribute locally at the color token, then a small number of attention heads in the back third of the network (centered around layer 9) reach back and copy that information forward to the position that’s about to generate text. But the experiment also taught me not to trust any single method on its own, the head with the loudest attention signal wasn’t the one actually doing the heavy lifting.</p>
+
+    
+  </article>
+
+  <div id="lightbox"><img id="lightbox-img" src="" alt="" /></div>
+
+  <script>
+    if (localStorage.getItem('dark') === 'off') document.body.classList.remove('dark');
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    document.querySelectorAll('article figure img').forEach(function (img) {
+      img.addEventListener('click', function () {
+        lightboxImg.src = img.src;
+        lightbox.classList.add('open');
+      });
+    });
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      lightboxImg.src = '';
+    }
+
+    lightbox.addEventListener('click', closeLightbox);
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key.toLowerCase() === 'd') {
+        const dark = document.body.classList.toggle('dark');
+        localStorage.setItem('dark', dark ? 'on' : 'off');
+      }
+      if (e.code === 'Escape') {
+        if (lightbox.classList.contains('open')) closeLightbox();
+        else window.location.href = '../blogs.html';
+      }
+    });
+  </script>
+</body>
+</html>

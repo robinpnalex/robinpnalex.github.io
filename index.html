@@ -155,7 +155,7 @@
     <div id="menu">
       <a id="github"   href="https://github.com/robinpnalex" target="_blank">github</a>
       <a id="art"      class="soon" href="#">art</a>
-      <a id="blogs"    class="soon" href="#">blogs</a>
+      <a id="blogs"    href="blogs.html">blogs</a>
       <a id="projects" class="soon" href="#">projects</a>
       <a id="photos"   href="photos.html">photos</a>
     </div>
@@ -212,6 +212,12 @@
 
     home.querySelector('span').addEventListener('click', openMenu);
     document.getElementById('robin-logo').addEventListener('click', closeMenu);
+
+    if (location.hash === '#menu') {
+      document.body.classList.remove('intro-running');
+      if (intro.parentNode) intro.remove();
+      openMenu();
+    }
 
     document.addEventListener('keydown', function (e) {
       const menuOpen = menu.classList.contains('visible');
