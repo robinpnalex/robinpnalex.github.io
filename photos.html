@@ -102,7 +102,7 @@
     document.addEventListener('keydown', function (e) {
       if (e.code === 'ArrowRight') show(current + 1);
       if (e.code === 'ArrowLeft')  show(current - 1);
-      if (e.code === 'Escape') window.location.href = 'index.html';
+      if (e.code === 'Escape') { e.preventDefault(); window.location.href = 'index.html'; }
       if (e.key.toLowerCase() === 'd') {
         const dark = document.body.classList.toggle('dark');
         localStorage.setItem('dark', dark ? 'on' : 'off');

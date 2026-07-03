@@ -21,9 +21,9 @@
     }
 
     article {
-      max-width: 640px;
+      max-width: 880px;
       margin: 0 auto;
-      padding: 14vh clamp(24px, 5vw, 52px) 12vh;
+      padding: 14vh clamp(20px, 3vw, 40px) 12vh;
     }
 
     h1 { font-size: clamp(24px, 2.4vw, 34px); font-weight: normal; color: #111; }
@@ -244,6 +244,7 @@ for layer in range(n_layers):
         localStorage.setItem('dark', dark ? 'on' : 'off');
       }
       if (e.code === 'Escape') {
+        e.preventDefault();
         if (lightbox.classList.contains('open')) closeLightbox();
         else window.location.href = '../blogs.html';
       }

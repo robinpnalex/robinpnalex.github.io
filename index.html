@@ -139,6 +139,18 @@
       cursor: pointer;
       z-index: 10;
     }
+
+    #hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #888;
+      opacity: 0.6;
+      font-size: clamp(11px, 0.85vw, 14px);
+      letter-spacing: 0.1em;
+      z-index: 10;
+    }
   </style>
 </head>
 <body class="intro-running dark">
@@ -159,12 +171,18 @@
       <a id="projects" class="soon" href="#">projects</a>
       <a id="photos"   href="photos.html">photos</a>
     </div>
+
+    <div id="hint">enter</div>
   </div>
 
   <script>
     const intro = document.getElementById('intro');
     const home = document.getElementById('home');
     const menu = document.getElementById('menu');
+    const hint = document.getElementById('hint');
+
+    const HOME_HINT = 'enter';
+    const MENU_HINT = 'first letter · enter · esc';
 
     if (localStorage.getItem('dark') === 'off') document.body.classList.remove('dark');
 
@@ -202,22 +220,31 @@
     function openMenu() {
       home.style.display = 'none';
       menu.classList.add('visible');
+      hint.textContent = MENU_HINT;
     }
 
     function closeMenu() {
       deselect();
       menu.classList.remove('visible');
       home.style.display = '';
+      hint.textContent = HOME_HINT;
     }
 
     home.querySelector('span').addEventListener('click', openMenu);
     document.getElementById('robin-logo').addEventListener('click', closeMenu);
 
-    if (location.hash === '#menu') {
-      document.body.classList.remove('intro-running');
-      if (intro.parentNode) intro.remove();
-      openMenu();
+    function openMenuIfHash() {
+      if (location.hash === '#menu') {
+        document.body.classList.remove('intro-running');
+        const introEl = document.getElementById('intro');
+        if (introEl) introEl.remove();
+        openMenu();
+      }
     }
+
+    openMenuIfHash();
+    window.addEventListener('pageshow', function (e) { if (e.persisted) openMenuIfHash(); });
+    window.addEventListener('hashchange', openMenuIfHash);
 
     document.addEventListener('keydown', function (e) {
       const menuOpen = menu.classList.contains('visible');
