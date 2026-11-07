@@ -44,7 +44,7 @@
 
   <div id="slideshow">
     <img id="photo" src="" alt="photo" />
-    <span id="empty" style="display: none; color: #888; font-size: clamp(14px, 1.2vw, 18px); letter-spacing: 0.1em;">photos coming soon</span>
+
   </div>
 
   <div id="counter"></div>
@@ -71,25 +71,23 @@
     let current = 0;
     const photoEl = document.getElementById('photo');
     const counterEl = document.getElementById('counter');
-    const emptyEl = document.getElementById('empty');
+
 
     if (localStorage.getItem('dark') === 'off') document.body.classList.remove('dark');
 
     photoEl.addEventListener('error', function () {
       photoEl.style.display = 'none';
       counterEl.textContent = '';
-      emptyEl.style.display = '';
     });
 
     photoEl.addEventListener('load', function () {
       photoEl.style.display = '';
-      emptyEl.style.display = 'none';
     });
 
     function show(index) {
       if (photos.length === 0) {
         photoEl.style.display = 'none';
-        emptyEl.style.display = '';
+        counterEl.textContent = '';
         return;
       }
       current = (index + photos.length) % photos.length;
