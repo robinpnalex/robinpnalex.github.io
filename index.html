@@ -96,10 +96,16 @@
     body.dark #home span { color: #eee; }
 
     #menu { display: none; width: 100%; height: 100%; position: relative; }
-    #menu.visible { display: block; }
+    #menu.visible {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2.4vh;
+    }
 
     #menu a {
-      position: absolute;
+      position: static;
       display: block;
       cursor: pointer;
       text-decoration: none;
@@ -111,11 +117,11 @@
     #menu a.selected { transform: scale(1.25); }
     #menu a.soon { opacity: 0.35; cursor: default; }
 
-    #github   { top: 38%; left: 42%; font-size: clamp(18px, 1.8vw, 32px); }
-    #art      { top: 35%; left: 54%; font-size: clamp(22px, 2.4vw, 42px); }
-    #blogs    { top: 48%; left: 46%; font-size: clamp(16px, 1.6vw, 28px); }
-    #projects { top: 53%; left: 34%; font-size: clamp(20px, 2.1vw, 37px); }
-    #photos   { top: 57%; left: 52%; font-size: clamp(25px, 2.8vw, 49px); }
+    #github   { font-size: clamp(22px, 2.4vw, 42px); }
+    #art      { font-size: clamp(22px, 2.4vw, 42px); }
+    #blogs    { font-size: clamp(22px, 2.4vw, 42px); }
+    #projects { font-size: clamp(22px, 2.4vw, 42px); }
+    #photos   { font-size: clamp(22px, 2.4vw, 42px); }
 
     @media (max-width: 640px) {
       #menu.visible {
