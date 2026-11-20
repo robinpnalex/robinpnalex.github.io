@@ -38,7 +38,8 @@ def convert_markdown(source: Path, destination: Path) -> None:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
-  <link rel="stylesheet" href="{asset_prefix}shortcuts.css">
+  <link rel="icon" type="image/svg+xml" href="{asset_prefix}images/robin.svg">
+  <link rel="stylesheet" href="{asset_prefix}css/shortcuts.css">
   <style>
     body {{ max-width: 760px; margin: 48px auto; padding: 0 24px; background: #fff; color: #222; font-family: system-ui, sans-serif; line-height: 1.6; }}
     body.dark {{ background: #171916; color: #eee; }}
@@ -51,7 +52,7 @@ def convert_markdown(source: Path, destination: Path) -> None:
 </head>
 <body class="dark">
   <main>{content}</main>
-  <script src="{asset_prefix}shortcuts.js" data-back="{back}"></script>
+  <script src="{asset_prefix}js/shortcuts.js" data-back="{back}"></script>
 </body>
 </html>
 """

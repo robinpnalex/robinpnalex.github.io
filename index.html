@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>robin alex</title>
-  <link rel="icon" href="images/favicon.png" />
-  <link rel="stylesheet" href="shortcuts.css">
+  <link rel="icon" type="image/svg+xml" href="images/robin.svg">
+  <link rel="stylesheet" href="css/shortcuts.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #fff; color: #111; font-family: Georgia, serif; }
@@ -92,36 +92,41 @@
       }
     }
 
+    #home {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      column-gap: clamp(32px, 8vw, 120px);
+      padding-inline: clamp(20px, 4vw, 64px);
+    }
+
     .site-header {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: clamp(20px, 3vw, 44px) clamp(20px, 4vw, 64px) 0;
+      padding-inline: clamp(20px, 4vw, 64px);
+      padding-top: clamp(20px, 3vw, 44px);
     }
 
     .site-header button,
-    .copy-email {
+    .welcome-mat,
+    [data-copy-email] {
       border: 0;
       background: transparent;
       color: inherit;
       cursor: pointer;
     }
 
-    .site-header h1 { font-weight: normal; }
-    .site-name { font: clamp(24px, 2.6vw, 38px) Georgia, serif; }
     #robin-logo img { display: block; width: clamp(32px, 4vw, 52px); }
     body.dark #robin-logo img,
     body.dark .home-batman { filter: invert(1); }
 
     #home {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-      gap: clamp(32px, 8vw, 120px);
       align-items: start;
-      padding: clamp(24px, 4vw, 56px) clamp(20px, 4vw, 64px) 80px;
+      padding-top: clamp(24px, 4vw, 56px);
+      padding-bottom: 80px;
     }
 
     .home-text {
+      --welcome-mat-width: 300px;
       display: grid;
       gap: clamp(20px, 2.4vw, 32px);
       line-height: 1.5;
@@ -129,19 +134,31 @@
 
     .home-about {
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-      align-items: start;
+      justify-items: center;
       gap: clamp(12px, 2vw, 24px);
+      margin-top: 12px;
     }
 
-    .home-text h2 {
-      margin-bottom: 6px;
-      font-size: 1.15rem;
-      font-weight: normal;
+    .home-about p {
+      width: min(100%, var(--welcome-mat-width));
+      /* Match the transparent left inset in welcome.webp. */
+      padding-left: min(3.8%, calc(var(--welcome-mat-width) * 0.038));
     }
 
-    .home-text a { color: inherit; }
-    .home-text p + p { margin-top: 8px; }
+    .welcome-mat {
+      justify-self: center;
+      display: block;
+      margin-top: 12px;
+      width: min(100%, var(--welcome-mat-width));
+      aspect-ratio: 1.64;
+    }
+
+    .welcome-mat img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
     .home-contact {
       display: flex;
@@ -151,8 +168,7 @@
 
     .home-batman {
       display: block;
-      width: 100%;
-      max-width: 160px;
+      width: min(40%, 160px);
       height: auto;
     }
 
@@ -162,6 +178,10 @@
       width: 44px;
       height: 44px;
     }
+
+    .reach-out { font: inherit; text-align: left; }
+
+    .home-about .email-status:not([hidden]) { display: block; }
 
     .email-status {
       font-size: 0.875rem;
@@ -204,6 +224,17 @@
       gap: 2.4vh;
     }
 
+    @media (prefers-reduced-motion: no-preference) {
+      .welcome-mat { transition: transform 100ms ease-out; }
+      .welcome-mat:active { transform: translateY(2px) scale(0.98); }
+      #menu.visible { animation: menu-fade-in 150ms ease-out; }
+    }
+
+    @keyframes menu-fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     #menu a {
       position: static;
       display: block;
@@ -222,7 +253,8 @@
     #projects { font-size: clamp(22px, 2.4vw, 42px); }
 
     @media (max-width: 720px) {
-      #home { grid-template-columns: 1fr; gap: 28px; }
+      #home { grid-template-columns: minmax(0, 1fr); }
+      #home { row-gap: 28px; }
       .home-photos { grid-column: 1; }
 
       #menu.visible {
@@ -238,18 +270,6 @@
     body.dark { background: #111; color: #eee; }
     body.dark #menu a { color: #eee; }
 
-    #hint {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #888;
-      opacity: 0.6;
-      font-size: clamp(11px, 0.85vw, 14px);
-      letter-spacing: 0.1em;
-      z-index: 10;
-    }
-
   </style>
 </head>
 <body class="intro-running dark">
@@ -262,34 +282,25 @@
       <button id="robin-logo" type="button" aria-label="Home">
         <img src="images/robin.svg" alt="">
       </button>
-      <h1><button class="site-name" type="button" aria-controls="menu" aria-expanded="false">robin alex</button></h1>
     </header>
     <main id="home">
       <div class="home-text">
+        <button class="welcome-mat" type="button" aria-label="Open menu" aria-controls="menu">
+          <img src="images/home/welcome.webp" alt="" width="500" height="500">
+        </button>
         <div class="home-about">
           <img class="home-batman" src="images/batman.svg" alt="Batman" width="800" height="800">
           <p>Hi, this is my house on the internet.<br>
-            Have a look around.</p>
-        </div>
-        <section aria-labelledby="writing-heading">
-          <h2 id="writing-heading">writing</h2>
-          <p><a href="blogs.html">Blogs</a> on what I’m exploring, including <a href="blogs/looking-inside-a-text-to-image-prompt-generator.html">a look inside a text-to-image prompt generator</a>.</p>
-          <p><a href="notes.html">Notes</a> for paper reviews, links, and loose thoughts on AI.</p>
-        </section>
-        <div class="home-contact">
-          <button class="copy-email" type="button" aria-label="Copy email address" title="Copy email address">
-            <svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-              <rect x="1" y="1" width="24" height="18" rx="2"/>
-              <path d="m2 3 11 9L24 3"/>
-            </svg>
-          </button>
-          <p class="email-status" role="status" hidden></p>
+            Have a look around.<br>
+            <button class="reach-out" type="button" data-copy-email title="Copy email address"><u>reach out</u> if you want to connect</button>
+            <span class="email-status" role="status" hidden></span>
+          </p>
         </div>
       </div>
       <div class="home-photos">
-        <img class="home-flower" src="flower.JPG" alt="Photograph of a flower" width="4608" height="3456" />
-        <img class="home-power" src="power.JPG" alt="Power photograph" width="4608" height="3456" />
-        <img class="home-tower" src="tower.JPG" alt="Photograph of a tower" width="3456" height="4608" />
+        <img class="home-flower" src="images/home/flower.JPG" alt="Photograph of a flower" width="4608" height="3456" />
+        <img class="home-power" src="images/home/power.JPG" alt="Power photograph" width="4608" height="3456" />
+        <img class="home-tower" src="images/home/tower.JPG" alt="Photograph of a tower" width="3456" height="4608" />
       </div>
     </main>
 
@@ -298,9 +309,16 @@
       <a id="blogs"    href="blogs.html">blogs</a>
       <a id="notes" href="notes.html">notes</a>
       <a id="projects" class="soon" href="#">projects</a>
+      <div class="home-contact">
+        <button class="copy-email" type="button" data-copy-email aria-label="Copy email address" title="Copy email address">
+          <svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <rect x="1" y="1" width="24" height="18" rx="2"/>
+            <path d="m2 3 11 9L24 3"/>
+          </svg>
+        </button>
+        <p class="email-status" role="status" hidden></p>
+      </div>
     </div>
-
-    <div id="hint">enter</div>
 
   </div>
 
@@ -308,22 +326,38 @@
     const intro = document.getElementById('intro');
     const home = document.getElementById('home');
     const menu = document.getElementById('menu');
-    const hint = document.getElementById('hint');
+    const welcomeMat = document.querySelector('.welcome-mat');
 
-    const HOME_HINT = 'enter';
-    const nameButton = document.querySelector('.site-name');
-    const nameHeading = nameButton.closest('h1');
-    const emailStatus = document.querySelector('.email-status');
-
-    document.querySelector('.copy-email').addEventListener('click', async function () {
+    async function copyEmail(event) {
+      const emailStatus = event.currentTarget.nextElementSibling;
       const email = 'robinalexpnn@gmail.com';
+      let copied = false;
       try {
         await navigator.clipboard.writeText(email);
-        emailStatus.textContent = 'Email copied.';
+        copied = true;
       } catch {
-        emailStatus.textContent = email;
+        // Keep the address available for manual copying.
       }
+
+      emailStatus.getAnimations().forEach(animation => animation.cancel());
+      emailStatus.textContent = copied ? 'Email copied.' : email;
       emailStatus.hidden = false;
+      if (!copied) return;
+
+      const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const fade = emailStatus.animate([
+        { opacity: 1 },
+        { opacity: 1, offset: 0.8, easing: reducedMotion ? 'step-end' : 'ease-out' },
+        { opacity: 0 },
+      ], 2000);
+      fade.finished.then(
+        () => { emailStatus.hidden = true; },
+        () => {} // A new copy can cancel the previous fade.
+      );
+    }
+
+    document.querySelectorAll('[data-copy-email]').forEach(button => {
+      button.addEventListener('click', copyEmail);
     });
 
     intro.addEventListener('animationend', function () {
@@ -334,21 +368,14 @@
     function openMenu() {
       home.style.display = 'none';
       menu.classList.add('visible');
-      nameButton.setAttribute('aria-expanded', 'true');
-      nameHeading.hidden = true;
-      hint.hidden = true;
     }
 
     function closeMenu() {
       menu.classList.remove('visible');
-      nameButton.setAttribute('aria-expanded', 'false');
-      nameHeading.hidden = false;
       home.style.display = '';
-      hint.textContent = HOME_HINT;
-      hint.hidden = false;
     }
 
-    nameButton.addEventListener('click', openMenu);
+    welcomeMat.addEventListener('click', openMenu);
     document.getElementById('robin-logo').addEventListener('click', closeMenu);
 
     function openMenuIfHash(event) {
@@ -367,6 +394,6 @@
     window.addEventListener('hashchange', openMenuIfHash);
 
   </script>
-  <script src="shortcuts.js"></script>
+  <script src="js/shortcuts.js"></script>
 </body>
 </html>

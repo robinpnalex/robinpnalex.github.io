@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>looking inside a text-to-image prompt generator — robin alex</title>
-  <link rel="icon" href="../images/favicon.png" />
-  <link rel="stylesheet" href="../shortcuts.css">
+  <link rel="icon" type="image/svg+xml" href="../images/robin.svg">
+  <link rel="stylesheet" href="../css/shortcuts.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #fff; font-family: Georgia, serif; color: #222; }
@@ -117,14 +117,14 @@ logits_blue, cache_blue = model.run_with_cache(prompt_blue)</code></pre>
 
     <p>This asks the model to predict <code>" red"</code> as the token right after “car”, which is a strange thing to ask of any language model, since colour words don’t usually repeat themselves immediately right after the noun they describe. The baseline probability was weak even before I started patching anything, which made results noisy.</p>
 
-    <figure><img src="2.webp" alt="test_prompt output for the cinematic shot prompt: rank 343, probability 0.00%" /></figure>
+    <figure><img src="../images/blogs/prompt-generator/2.webp" alt="test_prompt output for the cinematic shot prompt: rank 343, probability 0.00%" /></figure>
 
     <p>I switched to a prompt with an explicit recall structure which forces the model to return the same colour.</p>
 
     <pre><code>prompt_red  = "A photo of a red car. The color of the car is"
 prompt_blue = "A photo of a blue car. The color of the car is"</code></pre>
 
-    <figure><img src="1.webp" alt="test_prompt outputs for the recall-structured red and blue prompts, both rank 0" /></figure>
+    <figure><img src="../images/blogs/prompt-generator/1.webp" alt="test_prompt outputs for the recall-structured red and blue prompts, both rank 0" /></figure>
 
     <p>This gave a much cleaner signal: <code>" red"</code> and <code>" blue"</code> are now the literal next-token predictions, the two prompts are token-for-token identical apart from the color word, and the color token sits at the same position in both — which matters a lot once you start patching specific positions in the residual stream.</p>
 
@@ -136,7 +136,7 @@ prompt_blue = "A photo of a blue car. The color of the car is"</code></pre>
 attention_pattern = cache_red["pattern", layer_to_inspect]
 cv.attention.attention_patterns(tokens=tokens_red, attention=attention_pattern[0])</code></pre>
 
-    <figure class="wide"><img src="3.webp" alt="CircuitsVis attention patterns for all heads at layer 9" /></figure>
+    <figure class="wide"><img src="../images/blogs/prompt-generator/3.webp" alt="CircuitsVis attention patterns for all heads at layer 9" /></figure>
 
     <p>Eyeballing heatmaps for 144 heads isn’t practical, so I scored every head directly, how much attention weight does it put from the final token onto the color token:</p>
 
@@ -156,14 +156,14 @@ Layer 11, Head 10  |  Attention Weight: 0.1306</code></pre>
     <p>The top result: Layer 8, Head 11 (attention weight ≈ 0.20), with Layer 9, Head 9 right behind it (≈ 0.19). Both land in the back half of the network, that’s roughly where you’d expect “concept retrieval” to kick in, once the early layers are done handling basic syntax. Basically, these are the two heads doing most of the work of connecting the final token “is” back to “red.”</p>
 
     <figure class="wide">
-      <img src="4.webp" alt="layer 9 head 9 attention pattern with the red token highlighted from the is token" />
+      <img src="../images/blogs/prompt-generator/4.webp" alt="layer 9 head 9 attention pattern with the red token highlighted from the is token" />
       <figcaption>the “red” token lights up when you select the “is” token</figcaption>
     </figure>
 
-    <figure class="wide"><img src="5.webp" alt="layer 8 head 11 attention pattern" /></figure>
+    <figure class="wide"><img src="../images/blogs/prompt-generator/5.webp" alt="layer 8 head 11 attention pattern" /></figure>
 
     <figure class="wide">
-      <img src="6.webp" alt="layer 3 head 11 attention pattern attending along the diagonal" />
+      <img src="../images/blogs/prompt-generator/6.webp" alt="layer 3 head 11 attention pattern attending along the diagonal" />
       <figcaption>layer 3 head 11 as a contrasting example</figcaption>
     </figure>
 
@@ -182,7 +182,7 @@ for l, layer in enumerate(layers):
         logits = model.run_with_hooks(prompt_red, fwd_hooks=fwd_hooks)[0, -1]
         patching_effect[l, pos] = logits[clean_answer_index] - logits[corrupt_answer_index]</code></pre>
 
-    <figure><img src="7.webp" alt="heatmap of residual stream patching effect by layer and position" /></figure>
+    <figure><img src="../images/blogs/prompt-generator/7.webp" alt="heatmap of residual stream patching effect by layer and position" /></figure>
 
     <p>Two things stood out. First, patching the color token’s own position moves the score at almost every layer — expected, since causal attention means corrupting that token early on affects everything downstream that’s allowed to look back at it. The more interesting result is the final token’s position: patching it does almost nothing in early-to-mid layers, and only starts to matter from around layer 9 onward. That’s a clean signature of when the relevant information actually gets collected at the position that’s about to generate the next word — it isn’t there yet in the early layers; it has to be fetched.</p>
 
@@ -204,7 +204,7 @@ for layer in range(n_layers):
         logits = model.run_with_hooks(prompt_red, fwd_hooks=fwd_hooks)[0, -1]
         patching_effect[layer, head] = logits[clean_answer_index] - logits[corrupt_answer_index]</code></pre>
 
-    <figure class="wide"><img src="8.webp" alt="per-head patching heatmap showing which head causally carries red vs blue" /></figure>
+    <figure class="wide"><img src="../images/blogs/prompt-generator/8.webp" alt="per-head patching heatmap showing which head causally carries red vs blue" /></figure>
 
     <p>This is where the two methods disagreed in an interesting way. Layer 9, Head 9, my second-ranked head by attention weight, turned out to be the single most causally important head in the entire model, swinging the logit difference from a mildly “red” favoring baseline to a strongly “blue” favoring one almost on its own. Meanwhile Layer 8, Head 11, the head with the highest raw attention score, barely moved the needle by comparison. Attention weight pointed me toward the right neighborhood, but it wasn’t a reliable ranking of actual importance on its own.</p>
 
@@ -245,6 +245,6 @@ for layer in range(n_layers):
       }
     });
   </script>
-  <script src="../shortcuts.js" data-back="blogs.html"></script>
+  <script src="../js/shortcuts.js" data-back="blogs.html"></script>
 </body>
 </html>

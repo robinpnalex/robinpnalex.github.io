@@ -1,0 +1,12 @@
+.shortcut-selection {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 20;
+  color: #222;
+  opacity: 0.55;
+  font: 14px Georgia, serif;
+  text-decoration: underline;
+}
+
+body.dark .shortcut-selection { color: #eee; }
