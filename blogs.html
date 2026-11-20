@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>blogs — robin alex</title>
   <link rel="icon" href="images/favicon.png" />
+  <link rel="stylesheet" href="shortcuts.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { width: 100vw; height: 100vh; background: #fff; overflow: hidden; font-family: Georgia, serif; }
@@ -68,7 +69,6 @@
   <div id="hint">&uarr; &darr; &middot; enter</div>
 
   <script>
-    if (localStorage.getItem('dark') === 'off') document.body.classList.remove('dark');
 
     const links = Array.from(document.querySelectorAll('#list a'));
     let selected = -1;
@@ -80,17 +80,15 @@
     }
 
     document.addEventListener('keydown', function (e) {
+      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
       const key = e.key.toLowerCase();
-      if (key === 'd') {
-        const dark = document.body.classList.toggle('dark');
-        localStorage.setItem('dark', dark ? 'on' : 'off');
-        return;
-      }
-      if (e.code === 'Escape') { e.preventDefault(); window.location.href = 'index.html#menu'; return; }
       if (e.code === 'ArrowDown' || key === 'j') { e.preventDefault(); select(selected + 1); }
       if (e.code === 'ArrowUp' || key === 'k') { e.preventDefault(); select(selected - 1); }
-      if (e.code === 'Enter' && selected >= 0) links[selected].click();
+      if (e.key === 'Enter' && selected >= 0 && !e.target.closest('a[href], button, summary')) {
+        links[selected].click();
+      }
     });
   </script>
+  <script src="shortcuts.js" data-back="index.html#menu"></script>
 </body>
 </html>

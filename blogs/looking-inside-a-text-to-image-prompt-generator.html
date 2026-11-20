@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>looking inside a text-to-image prompt generator — robin alex</title>
   <link rel="icon" href="../images/favicon.png" />
+  <link rel="stylesheet" href="../shortcuts.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #fff; font-family: Georgia, serif; color: #222; }
@@ -219,7 +220,6 @@ for layer in range(n_layers):
   <div id="lightbox"><img id="lightbox-img" src="" alt="" /></div>
 
   <script>
-    if (localStorage.getItem('dark') === 'off') document.body.classList.remove('dark');
 
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
@@ -239,16 +239,12 @@ for layer in range(n_layers):
     lightbox.addEventListener('click', closeLightbox);
 
     document.addEventListener('keydown', function (e) {
-      if (e.key.toLowerCase() === 'd') {
-        const dark = document.body.classList.toggle('dark');
-        localStorage.setItem('dark', dark ? 'on' : 'off');
-      }
-      if (e.code === 'Escape') {
+      if (e.key === 'Escape' && lightbox.classList.contains('open')) {
         e.preventDefault();
-        if (lightbox.classList.contains('open')) closeLightbox();
-        else window.location.href = '../blogs.html';
+        closeLightbox();
       }
     });
   </script>
+  <script src="../shortcuts.js" data-back="blogs.html"></script>
 </body>
 </html>

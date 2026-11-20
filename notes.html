@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>notes — robin alex</title>
+  <link rel="icon" href="images/favicon.png">
+  <link rel="stylesheet" href="shortcuts.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #fff;
+      color: #111;
+      font-family: Georgia, serif;
+      line-height: 1.6;
+    }
+    body.dark { color-scheme: dark; background: #111; color: #eee; }
+    a { color: inherit; }
+    .home {
+      position: absolute;
+      top: clamp(10px, 1vw, 18px);
+      left: clamp(10px, 1vw, 18px);
+    }
+    .home img { display: block; height: clamp(30px, 3vw, 52px); }
+    body.dark .home img { filter: invert(1); }
+    main { max-width: 680px; margin: 0 auto; padding: 96px 24px 48px; }
+    h1 { font-size: clamp(28px, 3vw, 52px); font-weight: normal; margin: 0; }
+    article { margin-top: 32px; padding-top: 20px; border-top: 1px solid; }
+    h2 { margin: 0; font-weight: normal; }
+    time { font-size: 0.875rem; }
+  </style>
+</head>
+<body class="dark">
+  <a class="home" href="index.html#menu">
+    <img src="images/robin.svg" alt="Back to menu">
+  </a>
+  <main>
+    <h1>notes</h1>
+    <p>Reading notes, links, and loose thoughts.</p>
+    <section aria-labelledby="paper-review-heading">
+      <h2 id="paper-review-heading"><a href="weekly-paper-review.html">weekly paper review</a></h2>
+      <p>Reading notes from a paper each week.</p>
+    </section>
+    <div id="entries">
+      <p>No notes yet.</p>
+      <!-- Replace the empty-state paragraph with entries in newest-first order:
+      <article>
+        <time datetime="YYYY-MM-DD">Month D, YYYY</time>
+        <h2>Note title</h2>
+        <p>Note text and links.</p>
+      </article>
+      -->
+    </div>
+  </main>
+  <script src="shortcuts.js" data-back="index.html#menu"></script>
+</body>
+</html>

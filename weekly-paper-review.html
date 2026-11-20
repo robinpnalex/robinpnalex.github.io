@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>weekly paper review — robin alex</title>
+  <link rel="icon" href="images/favicon.png">
+  <link rel="stylesheet" href="shortcuts.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #fff;
+      color: #111;
+      font-family: Georgia, serif;
+      line-height: 1.6;
+    }
+    body.dark { color-scheme: dark; background: #111; color: #eee; }
+    a { color: inherit; }
+    .home {
+      position: absolute;
+      top: clamp(10px, 1vw, 18px);
+      left: clamp(10px, 1vw, 18px);
+    }
+    .home img { display: block; height: clamp(30px, 3vw, 52px); }
+    body.dark .home img { filter: invert(1); }
+    main { max-width: 680px; margin: 0 auto; padding: 96px 24px 48px; }
+    h1 { font-size: clamp(28px, 3vw, 52px); font-weight: normal; margin: 0; }
+    time { font-size: 0.875rem; }
+  </style>
+</head>
+<body class="dark">
+  <a class="home" href="notes.html">
+    <img src="images/robin.svg" alt="Back to notes">
+  </a>
+  <main>
+    <h1>weekly paper review</h1>
+    <p>No paper reviews yet.</p>
+    <ul id="reviews" hidden>
+      <!-- Remove the empty-state paragraph and the hidden attribute when adding the first review.
+      Add new entries at the top:
+      <li><time datetime="YYYY-MM-DD">Month D, YYYY</time> · <a href="paper-reviews/paper-title.html">Paper title</a></li>
+      -->
+    </ul>
+  </main>
+  <script src="shortcuts.js" data-back="notes.html"></script>
+</body>
+</html>

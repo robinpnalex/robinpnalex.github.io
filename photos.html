@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>photos — robin alex</title>
   <link rel="icon" href="images/favicon.png" />
+  <link rel="stylesheet" href="shortcuts.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { width: 100vw; height: 100vh; background: #fff; overflow: hidden; font-family: Georgia, serif; }
@@ -73,7 +74,6 @@
     const counterEl = document.getElementById('counter');
 
 
-    if (localStorage.getItem('dark') === 'off') document.body.classList.remove('dark');
 
     photoEl.addEventListener('error', function () {
       photoEl.style.display = 'none';
@@ -100,11 +100,6 @@
     document.addEventListener('keydown', function (e) {
       if (e.code === 'ArrowRight') show(current + 1);
       if (e.code === 'ArrowLeft')  show(current - 1);
-      if (e.code === 'Escape') { e.preventDefault(); window.location.href = 'index.html'; }
-      if (e.key.toLowerCase() === 'd') {
-        const dark = document.body.classList.toggle('dark');
-        localStorage.setItem('dark', dark ? 'on' : 'off');
-      }
     });
 
     document.getElementById('slideshow').addEventListener('click', function (e) {
@@ -112,5 +107,6 @@
       else show(current + 1);
     });
   </script>
+  <script src="shortcuts.js" data-back="index.html"></script>
 </body>
 </html>

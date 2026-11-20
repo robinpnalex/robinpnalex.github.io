@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>robin alex</title>
   <link rel="icon" href="images/favicon.png" />
+  <link rel="stylesheet" href="shortcuts.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { width: 100vw; height: 100vh; background: #fff; overflow: hidden; font-family: Georgia, serif; }
+    body { background: #fff; color: #111; font-family: Georgia, serif; }
 
     #site {
       width: 100%;
-      height: 100%;
+      min-height: 100vh;
       transition: filter 1.4s ease, opacity 1.4s ease;
     }
 
@@ -91,11 +92,110 @@
       }
     }
 
-    #home { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-    #home span { font-family: Georgia, serif; font-size: clamp(28px, 3vw, 52px); color: #111; }
-    body.dark #home span { color: #eee; }
+    .site-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: clamp(20px, 3vw, 44px) clamp(20px, 4vw, 64px) 0;
+    }
 
-    #menu { display: none; width: 100%; height: 100%; position: relative; }
+    .site-header button,
+    .copy-email {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .site-header h1 { font-weight: normal; }
+    .site-name { font: clamp(24px, 2.6vw, 38px) Georgia, serif; }
+    #robin-logo img { display: block; width: clamp(32px, 4vw, 52px); }
+    body.dark #robin-logo img,
+    body.dark .home-batman { filter: invert(1); }
+
+    #home {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      gap: clamp(32px, 8vw, 120px);
+      align-items: start;
+      padding: clamp(24px, 4vw, 56px) clamp(20px, 4vw, 64px) 80px;
+    }
+
+    .home-text {
+      display: grid;
+      gap: clamp(20px, 2.4vw, 32px);
+      line-height: 1.5;
+    }
+
+    .home-about {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      align-items: start;
+      gap: clamp(12px, 2vw, 24px);
+    }
+
+    .home-text h2 {
+      margin-bottom: 6px;
+      font-size: 1.15rem;
+      font-weight: normal;
+    }
+
+    .home-text a { color: inherit; }
+    .home-text p + p { margin-top: 8px; }
+
+    .home-contact {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .home-batman {
+      display: block;
+      width: 100%;
+      max-width: 160px;
+      height: auto;
+    }
+
+    .copy-email {
+      display: inline-grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+    }
+
+    .email-status {
+      font-size: 0.875rem;
+      overflow-wrap: anywhere;
+    }
+
+    .home-photos {
+      grid-column: 2;
+      display: grid;
+      grid-template-columns: minmax(0, 52fr) minmax(0, 48fr);
+      grid-template-rows: minmax(0, 17fr) minmax(0, 15fr);
+      grid-template-areas:
+        "flower tower"
+        "power tower";
+      gap: clamp(8px, 1.2vw, 18px);
+      width: min(100%, 960px);
+      aspect-ratio: 3 / 2;
+    }
+
+    .home-photos img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .home-flower { grid-area: flower; }
+    .home-power {
+      grid-area: power;
+      object-position: center top;
+    }
+    .home-tower { grid-area: tower; }
+
+    #menu { display: none; width: 100%; min-height: 75vh; position: relative; }
     #menu.visible {
       display: flex;
       flex-direction: column;
@@ -118,12 +218,13 @@
     #menu a.soon { opacity: 0.35; cursor: default; }
 
     #github   { font-size: clamp(22px, 2.4vw, 42px); }
-    #art      { font-size: clamp(22px, 2.4vw, 42px); }
-    #blogs    { font-size: clamp(22px, 2.4vw, 42px); }
+    #blogs, #notes { font-size: clamp(22px, 2.4vw, 42px); }
     #projects { font-size: clamp(22px, 2.4vw, 42px); }
-    #photos   { font-size: clamp(22px, 2.4vw, 42px); }
 
-    @media (max-width: 640px) {
+    @media (max-width: 720px) {
+      #home { grid-template-columns: 1fr; gap: 28px; }
+      .home-photos { grid-column: 1; }
+
       #menu.visible {
         display: flex;
         flex-direction: column;
@@ -134,17 +235,8 @@
       #menu a { position: static; }
     }
 
-    body.dark { background: #111; }
+    body.dark { background: #111; color: #eee; }
     body.dark #menu a { color: #eee; }
-    body.dark #robin-logo { filter: invert(1); }
-    #robin-logo {
-      position: fixed;
-      top: clamp(10px, 1vw, 18px);
-      left: clamp(10px, 1vw, 18px);
-      height: clamp(30px, 3vw, 52px);
-      cursor: pointer;
-      z-index: 10;
-    }
 
     #hint {
       position: fixed;
@@ -157,6 +249,7 @@
       letter-spacing: 0.1em;
       z-index: 10;
     }
+
   </style>
 </head>
 <body class="intro-running dark">
@@ -165,20 +258,50 @@
   </div>
 
   <div id="site">
-    <img id="robin-logo" src="images/robin.svg" alt="robin" />
-    <div id="home">
-      <span>robin alex</span>
-    </div>
+    <header class="site-header">
+      <button id="robin-logo" type="button" aria-label="Home">
+        <img src="images/robin.svg" alt="">
+      </button>
+      <h1><button class="site-name" type="button" aria-controls="menu" aria-expanded="false">robin alex</button></h1>
+    </header>
+    <main id="home">
+      <div class="home-text">
+        <div class="home-about">
+          <img class="home-batman" src="images/batman.svg" alt="Batman" width="800" height="800">
+          <p>Hi, this is my house on the internet.<br>
+            Have a look around.</p>
+        </div>
+        <section aria-labelledby="writing-heading">
+          <h2 id="writing-heading">writing</h2>
+          <p><a href="blogs.html">Blogs</a> on what I’m exploring, including <a href="blogs/looking-inside-a-text-to-image-prompt-generator.html">a look inside a text-to-image prompt generator</a>.</p>
+          <p><a href="notes.html">Notes</a> for paper reviews, links, and loose thoughts on AI.</p>
+        </section>
+        <div class="home-contact">
+          <button class="copy-email" type="button" aria-label="Copy email address" title="Copy email address">
+            <svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <rect x="1" y="1" width="24" height="18" rx="2"/>
+              <path d="m2 3 11 9L24 3"/>
+            </svg>
+          </button>
+          <p class="email-status" role="status" hidden></p>
+        </div>
+      </div>
+      <div class="home-photos">
+        <img class="home-flower" src="flower.JPG" alt="Photograph of a flower" width="4608" height="3456" />
+        <img class="home-power" src="power.JPG" alt="Power photograph" width="4608" height="3456" />
+        <img class="home-tower" src="tower.JPG" alt="Photograph of a tower" width="3456" height="4608" />
+      </div>
+    </main>
 
     <div id="menu">
       <a id="github"   href="https://github.com/robinpnalex" target="_blank">github</a>
-      <a id="art"      class="soon" href="#">art</a>
       <a id="blogs"    href="blogs.html">blogs</a>
+      <a id="notes" href="notes.html">notes</a>
       <a id="projects" class="soon" href="#">projects</a>
-      <a id="photos"   href="photos.html">photos</a>
     </div>
 
     <div id="hint">enter</div>
+
   </div>
 
   <script>
@@ -188,100 +311,62 @@
     const hint = document.getElementById('hint');
 
     const HOME_HINT = 'enter';
-    const MENU_HINT = 'first letter · enter · esc';
+    const nameButton = document.querySelector('.site-name');
+    const nameHeading = nameButton.closest('h1');
+    const emailStatus = document.querySelector('.email-status');
 
-    if (localStorage.getItem('dark') === 'off') document.body.classList.remove('dark');
-
-    function toggleDark() {
-      const dark = document.body.classList.toggle('dark');
-      localStorage.setItem('dark', dark ? 'on' : 'off');
-    }
+    document.querySelector('.copy-email').addEventListener('click', async function () {
+      const email = 'robinalexpnn@gmail.com';
+      try {
+        await navigator.clipboard.writeText(email);
+        emailStatus.textContent = 'Email copied.';
+      } catch {
+        emailStatus.textContent = email;
+      }
+      emailStatus.hidden = false;
+    });
 
     intro.addEventListener('animationend', function () {
       document.body.classList.remove('intro-running');
       intro.remove();
     }, { once: true });
 
-    const keyMap = {
-      g: ['github'],
-      a: ['art'],
-      b: ['blogs'],
-      p: ['projects', 'photos'],
-    };
-
-    let selected = null;
-    let cycleIndex = 0;
-
-    function select(id) {
-      if (selected) document.getElementById(selected).classList.remove('selected');
-      selected = id;
-      document.getElementById(selected).classList.add('selected');
-    }
-
-    function deselect() {
-      if (selected) document.getElementById(selected).classList.remove('selected');
-      selected = null;
-    }
-
     function openMenu() {
       home.style.display = 'none';
       menu.classList.add('visible');
-      hint.textContent = MENU_HINT;
+      nameButton.setAttribute('aria-expanded', 'true');
+      nameHeading.hidden = true;
+      hint.hidden = true;
     }
 
     function closeMenu() {
-      deselect();
       menu.classList.remove('visible');
+      nameButton.setAttribute('aria-expanded', 'false');
+      nameHeading.hidden = false;
       home.style.display = '';
       hint.textContent = HOME_HINT;
+      hint.hidden = false;
     }
 
-    home.querySelector('span').addEventListener('click', openMenu);
+    nameButton.addEventListener('click', openMenu);
     document.getElementById('robin-logo').addEventListener('click', closeMenu);
 
-    function openMenuIfHash() {
-      if (location.hash === '#menu') {
-        document.body.classList.remove('intro-running');
-        const introEl = document.getElementById('intro');
-        if (introEl) introEl.remove();
-        openMenu();
-      }
+    function openMenuIfHash(event) {
+      if (location.hash !== '#menu') return;
+
+      history.replaceState(history.state, '', location.pathname + location.search);
+      if (!event && performance.getEntriesByType('navigation')[0]?.type === 'reload') return;
+
+      document.body.classList.remove('intro-running');
+      document.getElementById('intro')?.remove();
+      openMenu();
     }
 
     openMenuIfHash();
     window.addEventListener('pageshow', function (e) { if (e.persisted) openMenuIfHash(); });
     window.addEventListener('hashchange', openMenuIfHash);
 
-    document.addEventListener('keydown', function (e) {
-      const menuOpen = menu.classList.contains('visible');
-
-      if (e.key.toLowerCase() === 'd') { toggleDark(); return; }
-      if (e.code === 'Enter' && !menuOpen) { e.preventDefault(); openMenu(); return; }
-      if ((e.code === 'Escape' || e.code === 'Backspace') && menuOpen && !selected) { closeMenu(); return; }
-      if ((e.code === 'Escape' || e.code === 'Backspace') && menuOpen && selected) { deselect(); return; }
-
-      if (menuOpen && e.code === 'Enter' && selected) {
-        e.preventDefault();
-        document.getElementById(selected).click();
-        return;
-      }
-
-      if (menuOpen) {
-        const key = e.key.toLowerCase();
-        const items = keyMap[key];
-        if (!items) return;
-        if (items.length === 1) {
-          selected === items[0] ? deselect() : select(items[0]);
-        } else {
-          if (selected && items.includes(selected)) {
-            cycleIndex = (items.indexOf(selected) + 1) % items.length;
-          } else {
-            cycleIndex = 0;
-          }
-          select(items[cycleIndex]);
-        }
-      }
-    });
   </script>
+  <script src="shortcuts.js"></script>
 </body>
 </html>
